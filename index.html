@@ -1,1 +1,323 @@
+<!doctype html>
+<html>
 
+<head>
+    <meta charset="utf-8">
+    <title>実験</title>
+    <script>
+        //管理用変数
+        var n = 0;
+        var show_time = 0;
+        var second = 0;
+        var true_second = 0;
+        var word_count = 0;
+        var t = 1;
+        var count = 0;
+        var before_time = 0;
+        var answer_time = 0;
+        var answer_count = 0;
+        var time_count = [];
+        var search_count = [];
+        var rank_count = [];
+        var presure = ["HP", "LP"];
+        var selected_presure = presure[Math.floor(Math.random() * presure.length)];
+
+        //タイマー用変数
+        var start = new Date();
+        var startHour = start.getHours();
+        var startMin = start.getMinutes();
+        var startSec = start.getSeconds();
+
+        //語群
+        var Word = [["筆箱", 1], ["鉛筆", 3], ["消しゴム", 2], ["定規", 4], ["赤ペン", 1], ["シャーペン", 3],
+        ["サッカー", 2], ["野球", 4], ["バスケ", 1], ["バレー", 3], ["陸上", 2], ["テニス", 4], ["水泳", 2],
+        ["体操", 2], ["レスリング", 4], ["自転車", 1], ["ボート", 3], ["ボクシング", 2], ["近代五種", 4],
+        ["バドミントン", 2], ["カヌー", 4], ["空手", 1], ["サーフィン", 3], ["ゴルフ", 2], ["卓球", 4],
+        ["柔道", 2], ["馬術", 4], ["トライアスロン", 1], ["アーチェリー", 3], ["テコンドー", 2], ["ラグビー", 4],
+        ["マグロ", 2], ["イカ", 4], ["タコ", 1], ["アジ", 3], ["タイ", 2], ["エビ", 4],
+        ["巻雲", 2], ["高積雲", 4], ["積乱雲", 1], ["乱層雲", 3], ["層積雲", 2], ["高層雲", 4],
+        ["晴天", 2], ["雨天", 4], ["曇天", 1], ["日本", 3], ["アメリカ", 2], ["イギリス", 4],
+        ["中国", 2], ["フランス", 4], ["韓国", 1], ["オーストラリア", 3], ["シンガポール", 2], ["イタリア", 4]];
+        document.addEventListener('keypress', keypress_ivent);
+
+        function onClickCopy() {
+            // コピー対象のpタグオブジェクトを取得する.
+            // let pTag = document.getElementById('copyTarget');
+            // コピー内容を選択する.
+            let range = document.createRange();
+            var copy_word = Word[count][0];
+            range.selectNodeContents(searchWord);
+            let selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            // 選択したものをコピーする.
+            document.execCommand('copy');
+            // コピー内容の選択を解除する.
+            selection.removeAllRanges();
+        }
+
+        function makeNonliner(s) {
+            if (selected_presure == "HP") {
+                if (second < 300) {
+                    show_time = second * 1.1;
+                } else if (second >= 300) {
+                    show_time = 330 + t * 0.9;
+                    t += 1;
+                }
+            } else if (selected_presure == "LP") {
+                if (second < 300) {
+                    show_time = second * 0.9;
+                } else if (second >= 300) {
+                    show_time = 270 + t * 1.1;
+                    t += 1;
+                }
+            }
+            second += 1;
+            return show_time;
+        }
+
+        function getRandam(n, m) {
+            let num = Math.floor(Math.random() * (m + 1 - n)) + n;
+            return num;
+            // console.log(num);
+        };
+
+        function keypress_ivent(e) {
+            if (true_second - before_time < 3) {
+            } else {
+                if (e.key === 'Enter') {
+                    Word[count][1] = Word[count][1] + 1;
+                    if (Word[count][1] > 4) {
+                        Word[count][1] = 1;
+                    }
+                    //count = getRandam(0, 12);
+                    count += 1;
+                    if (count > 54) {
+                        count = 0;
+                    }
+
+                }
+
+                answer_time = true_second - before_time;
+                before_time = true_second;
+                answer_count += 1;
+                time_count.push(answer_time);
+                search_count.push(Word[count][0]);
+                rank_count.push(Word[count][1] + "番目");
+                searchWord.innerHTML = Word[count][0];
+                searchRank.innerHTML = Word[count][1] + "番目";
+            }
+            return false;
+        }
+
+        function keypress() {
+            if (true_second - before_time < 3) {
+
+            } else {
+                Word[count][1] = Word[count][1] + 1;
+                if (Word[count][1] > 4) {
+                    Word[count][1] = 1;
+                }
+                //count = getRandam(0, 12);
+                count += 1;
+                if (count > 54) {
+                    count = 0;
+                }
+
+
+                answer_time = true_second - before_time;
+                before_time = true_second;
+                answer_count += 1;
+                time_count.push(answer_time);
+                search_count.push(Word[count][0]);
+                rank_count.push(Word[count][1] + "番目");
+                searchWord.innerHTML = Word[count][0];
+                searchRank.innerHTML = Word[count][1] + "番目";
+            }
+
+            return false;
+        }
+
+        function clearCasnvas() {
+            var canvas = document.getElementById("main");
+            var context = canvas.getContext("2d");
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+        }
+
+        //プログレスバー作成
+        function drawRect() {
+            var canvas = document.getElementById("main");
+            var context = canvas.getContext("2d");
+
+            clearCasnvas();
+
+            n = (600 - show_time) / 6;
+
+            for (var i = 0; i < n; i++) {
+                context.fillStyle = "green";
+                context.strokeStyle = "black"
+                context.fillRect(644 - 6 * i, 10, 5, 30);
+            }
+            context.strokeStyle = "black"
+            context.strokeRect(50, 10, 600, 30);
+            context.strokeStyle = "black"
+            context.strokeRect(50, 10, 600, 30);
+            context.strokeStyle = "black"
+            context.strokeRect(50, 10, 600, 30);
+
+
+        }
+
+        function clock() {
+            //管理用変数
+
+            //時計関係の変数
+            var now = new Date();
+            var hour = now.getHours();
+            var min = now.getMinutes();
+            var sec = now.getSeconds();
+
+            //プログレスバー関係の変数
+            var count_rect = 100;
+
+            //タイマー表示用の変数
+            var timeElement = document.getElementById("time");
+            var time2Element = document.getElementById("time2");
+            var timerElement = document.getElementById("timer")
+
+            // timeElement.innerHTML = hour + ":" + min + ":" + sec;
+            // console.log(hour);
+            // console.log(typeof (hour));
+            //console.log(startHour);
+            //console.log(hour - startHour);
+            // time2Element.innerHTML = (hour - startHour) + ":" + (min - startMin) + ":" + (sec - startSec);
+
+            //開始時刻と現在時刻の差
+            var timerHour = hour - startHour;
+            var timerMin = min - startMin;
+            var timerSec = sec - startSec;
+
+            //値がマイナスの場合プラスに変更する
+            if (timerHour < 0) {
+                timerHour = timerHour * -1;
+            }
+            if (timerHour < 0) {
+                timerMin = timerMin * -1;
+            }
+            if (timerHour < 0) {
+                timerSec = timerSec * -1;
+            }
+
+            //秒に変換
+            second = (timerHour * 3600) + (timerMin * 60) + timerSec;
+            true_second = (timerHour * 3600) + (timerMin * 60) + timerSec;
+
+            //非線形時計
+            show_time = makeNonliner();
+            // timerElement.innerHTML = show_time;
+
+            drawRect();
+            if (second > 600) {
+                // alert(answer_count);
+                // alert(time_count);
+                //結果表示用
+                var result = document.getElementById("result_area");
+                var presureType = document.getElementById("presure_area");
+                var answerCount = document.getElementById("answer_area");
+                var timeCount = document.getElementById("time_area");
+
+                result.innerHTML = "結果";
+                presureType.innerHTML = "タイプ" + selected_presure;
+                answerCount.innerHTML = "回答数" + answer_count;
+                timeCount.innerHTML = "回答時間" + time_count;
+            } else {
+                //1秒ごとにループ
+                //ここを変更しても意味がない
+                //1秒ごとにループする中で，値を変更する
+                setTimeout("clock()", 1000);
+
+            }
+
+        }
+
+        function main() {
+            var searchWord = document.getElementById("searchWord");
+            var searchRank = document.getElementById("searchRank");
+            searchWord.innerHTML = Word[count][0];
+            searchRank.innerHTML = Word[count][1] + "番目";
+
+            //console.log(selected_presure);
+            clock();
+        }
+    </script>
+    <style>
+        canvas {
+            border: solid #000000 1px;
+        }
+
+        #clock {
+            font-family: "Courier New";
+            background-color: #CCCCCC;
+            border: solid #999999 1px;
+            color: #000000;
+            width: 300px;
+            padding: 10px;
+        }
+
+        #time {
+            font-size: 42pt;
+        }
+
+        #time2 {
+            font-size: 42pt;
+        }
+
+        #timer {
+            font-size: 42pt;
+        }
+    </style>
+</head>
+
+<body onLoad="main()">
+    </div>
+    <canvas id="main" width="700" height="200">
+    </canvas>
+    <font size="6">
+        <div style="position: absolute;top:60px;left: 150px;">検索ワード</div>
+        <div style="position: absolute;top:60px;left: 425px;">検索結果 </div>
+        <div style="position: absolute;top:130px;left: 150px;">
+            <div id="searchWord"></div>
+        </div>
+        <div style="position: absolute;top:130px;left: 425px;">
+            <div id="searchRank"></div>
+        </div>
+        <div id="area">
+            <div style="position: absolute;top:165px;left: 145px;">
+                <input type="button" id="copy" value="コピーする" onclick="onClickCopy();">
+            </div>
+            <div style="position: absolute;top:165px;left: 420px;">
+                <input type="button" id="next" value="次へ" onclick="keypress();">
+            </div>
+        </div>
+    </font>
+    <!-- <font size="5">
+    <p id="worfList_area">語群</p>
+    <p id="wordA_area">筆箱　鉛筆　消しゴム　定規　赤ペン　シャーペン</p>
+    <p id="wordB_area">サッカー　野球　バスケ　バレー　陸上　テニス　水泳</p>
+  </font> -->
+    <!-- <div id="clock">
+        <div id="time">--:--:--</div>
+        <div id="time2">--:--:--</div>
+        <div id="timer"></div>
+    </div> -->
+    <font size="6">
+        <div id="result_area"></div>
+        <div id="presure_area"></div>
+        <div id="answer_area"></div>
+        <div id="time_area"></div>
+    </font>
+</body>
+
+</html>
